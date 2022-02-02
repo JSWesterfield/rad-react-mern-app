@@ -4,17 +4,23 @@ const app = express();
 
 const MongoClient = require('mongodb').MongoClient
 
-MongoClient.connect('mongodb://localhost:27017/lists', function (err, client) {
+let db;
+
+MongoClient.connect('mongodb://localhost:27017/lists', { useUnifiedTopology: true }, function (err, client) {
     if (err) throw err
 
-    var db = client.db('lists')
-
+    db = client.db('lists')
 })
 
 app.get('/', (req, res) => {
     res.json('did this work');
 })
 
-app.listen(3000, () => {
+app.get('/lists', async (req, res) => {
+    const lists = await db.collection('lists').find().toArray();
+    res.json('Our lists!');
+})
+
+app.listen(3001, () => {
     console.log('work pls');
 })
